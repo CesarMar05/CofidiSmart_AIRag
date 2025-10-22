@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../AT2Soft.RAGEngine.Application.Abstractions/AT2Soft.RAGEngine.Application.Abstractions.csproj" />
+    <ProjectReference Include="../AT2Soft.RAGEngine.Domain/AT2Soft.RAGEngine.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AT2Soft.Application" Version="1.4.8" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.6.13" />
+    <PackageReference Include="MediatR" Version="13.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features/Chat/Queries/" />
+    <Folder Include="Features/Ingest/Commands/" />
+    <Folder Include="Features/Knowledge/Services/" />
+  </ItemGroup>
+
+</Project>
