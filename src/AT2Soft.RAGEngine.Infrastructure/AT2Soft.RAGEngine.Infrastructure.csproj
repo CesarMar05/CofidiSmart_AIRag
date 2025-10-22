@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../AT2soft.PdfTextExtractor/AT2soft.PdfTextExtractor.csproj" />
+    <ProjectReference Include="../AT2Soft.RAGEngine.Application.Abstractions/AT2Soft.RAGEngine.Application.Abstractions.csproj" />
+    <ProjectReference Include="../AT2Soft.RAGEngine.Application/AT2Soft.RAGEngine.Application.csproj" />
+    <ProjectReference Include="../AT2Soft.RAGEngine.Domain/AT2Soft.RAGEngine.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Refit" Version="8.0.0" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>
