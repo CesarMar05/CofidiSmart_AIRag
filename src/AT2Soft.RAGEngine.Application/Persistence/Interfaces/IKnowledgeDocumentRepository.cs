@@ -1,8 +1,6 @@
 using AT2Soft.RAGEngine.Domain.Entities;
-using AT2Soft.RAGEngine.Domain.Interfaces;
-using AT2Soft.RAGEngine.Domain.Models;
 
-namespace AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+namespace AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 
 public interface IKnowledgeDocumentRepository : IRepository<KnowledgeDocument, Guid>
 {

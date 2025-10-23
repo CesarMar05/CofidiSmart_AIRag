@@ -3,9 +3,9 @@ using AT2Soft.RAGEngine.Application.Abstractions.DTOs;
 using AT2Soft.RAGEngine.Application.DTOs;
 using AT2Soft.RAGEngine.Application.Helpers;
 using AT2Soft.RAGEngine.Application.Interfaces;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
 using AT2Soft.RAGEngine.Application.Interfaces.Security;
 using AT2Soft.RAGEngine.Application.Interfaces.Services;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 
 namespace AT2Soft.RAGEngine.Application.Features.AppClient.Services;
@@ -65,7 +65,7 @@ public class ApplicationClientService : IApplicationClientService
 
     public async Task<Result<List<ApplicationClient>>> GetListAppClient(CancellationToken cancellationToken = default)
     {
-        return (await _applicationClientRepository.GetListAsync(cancellationToken))
+        return (await _applicationClientRepository.GetListAsync(cancellationToken: cancellationToken))
             .ToList();
     }
 

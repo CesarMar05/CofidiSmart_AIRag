@@ -4,10 +4,8 @@ namespace AT2Soft.RAGEngine.Application.Features.Prompt.Functions;
 
 public class PromptFunctions
 {
-    public static string BuildPrompt(string query, List<string> contextChunks)
+    public static string DefaultPrompt(string query, string context)
     {
-        var context = string.Join("\n", contextChunks);
-
         return $"""
         Usa el contexto proporcionado para responder la siguiente pregunta de forma clara y completa.
             - No repitas textualmente el contenido del contexto.

@@ -2,6 +2,8 @@ using System.Reflection;
 using AT2Soft.RAGEngine.Application.Features.AppClient.Services;
 using AT2Soft.RAGEngine.Application.Features.Ingest.Services;
 using AT2Soft.RAGEngine.Application.Features.KnowledgeDocument.Services;
+using AT2Soft.RAGEngine.Application.Features.Prompt.Interfaces;
+using AT2Soft.RAGEngine.Application.Features.Prompt.Services;
 using AT2Soft.RAGEngine.Application.Features.RagIngestJob.Services;
 using AT2Soft.RAGEngine.Application.Interfaces;
 using AT2Soft.RAGEngine.Application.Interfaces.Services;
@@ -27,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IApplicationClientService, ApplicationClientService>();
         services.AddScoped<IRagIngestJobServices, RagIngestJobServices>();
         services.AddScoped<IIngestTextService, IngestTextService>();
+        services.AddScoped<IPromptServices, PromptServices>();
 
         return services;
     }

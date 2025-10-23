@@ -1,4 +1,4 @@
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 using AT2Soft.RAGEngine.Domain.Models;
 using AT2Soft.RAGEngine.Infrastructure.Persistence.Data;
