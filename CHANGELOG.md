@@ -6,12 +6,24 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.1 MVP]
+### Added
+- Se agreaga Prompt a ApplicationClient para poder personalizar el Prompt por Aplicación.
+- Se agrega Controlador de Migrations para crear y actulizar la base de datos.
+- Se agrega Controlador de Version que lista las versiones de los componentes del API.
+- Se crea Migración Change03.
+
+### Changed
+- Se mueven interfaces de Repository de Application.Abstraction a Application
+- Se actualiza RespositoryBase para ser mas general.
+
+---
+
 ## [0.1.0 MVP] - 2025-07-24
 ### Added
 - MVP Versión inicial: estructura básica, carga de documentos, generación de embeddings y consulta a modelo vía LangChain.
 
 ---
-
 
 
 ## [Unreleased]

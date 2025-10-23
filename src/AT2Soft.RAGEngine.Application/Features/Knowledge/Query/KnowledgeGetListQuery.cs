@@ -1,5 +1,5 @@
 using AT2Soft.Application.Result;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using MediatR;
 
 namespace AT2Soft.RAGEngine.Application.Features.Knowledge.Query;
@@ -17,7 +17,7 @@ internal class KnowledgeGetListQueryHandler : IRequestHandler<KnowledgeGetListQu
 
     public async Task<Result<List<Domain.Entities.Knowledge>>> Handle(KnowledgeGetListQuery request, CancellationToken cancellationToken)
     {
-        return (await _knowledgeRepository.GetListAsync(cancellationToken))
+        return (await _knowledgeRepository.GetListAsync(cancellationToken: cancellationToken))
             .ToList();
     }
 }

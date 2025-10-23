@@ -1,7 +1,6 @@
 using AT2Soft.RAGEngine.Domain.Entities;
-using AT2Soft.RAGEngine.Domain.Interfaces;
 
-namespace AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+namespace AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 
 public interface IChunkRepository : IRepository<Chunk, int>
 {

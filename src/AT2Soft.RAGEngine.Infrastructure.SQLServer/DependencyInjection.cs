@@ -1,5 +1,6 @@
 using AT2Soft.RAGEngine.Application.Interfaces;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
+using AT2Soft.RAGEngine.Application.Persistence.Migrations;
 using AT2Soft.RAGEngine.Infrastructure.SQLServer.Data;
 using AT2Soft.RAGEngine.Infrastructure.SQLServer.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IChunkRepository, ChunkRepository>();
         services.AddScoped<IApplicationClientRepository, ApplicationClientRepository>();
         services.AddScoped<IRagIngestJobRepository, RagIngestJobRepository>();
+        services.AddScoped<IMigrationRepository, MigrationRepository>();
 
         return services;
     }

@@ -1,11 +1,11 @@
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 using AT2Soft.RAGEngine.Infrastructure.SQLServer.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Repository;
 
-public class ApplicationClientRepository(RAGSqlServerDbContext context) : BaseRepository<ApplicationClient, Guid>(context), IApplicationClientRepository
+public class ApplicationClientRepository(RAGSqlServerDbContext context) : RepositoryBase<ApplicationClient, Guid>(context), IApplicationClientRepository
 {
     public async Task<ApplicationClient?> GetFullDataByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
