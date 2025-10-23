@@ -1,5 +1,5 @@
 using AT2Soft.RAGEngine.Application.Abstractions.DTOs;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 using AT2Soft.RAGEngine.Infrastructure.SQLServer.Data;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Repository;
 
 
-public class RagIngestJobRepository(RAGSqlServerDbContext context) : BaseRepository<RagIngestJob, Guid>(context), IRagIngestJobRepository
+public class RagIngestJobRepository(RAGSqlServerDbContext context) : RepositoryBase<RagIngestJob, Guid>(context), IRagIngestJobRepository
 {
     public Task<bool> ExistDigest(Guid applicationId, string digest, CancellationToken cancellationToken = default)
     {

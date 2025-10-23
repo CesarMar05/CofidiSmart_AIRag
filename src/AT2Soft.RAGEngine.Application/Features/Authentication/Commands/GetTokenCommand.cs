@@ -1,7 +1,7 @@
 using AT2Soft.Application.Result;
 using AT2Soft.RAGEngine.Application.DTOs;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
 using AT2Soft.RAGEngine.Application.Interfaces.Security;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using MediatR;
 
 namespace AT2Soft.RAGEngine.Application.Features.Authentication.Commands;

@@ -1,4 +1,4 @@
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Enums;
 using AT2Soft.RAGEngine.Infrastructure.Persistence.Qdrant.APIClient;
 using AT2Soft.RAGEngine.Infrastructure.Persistence.Qdrant.Enums;

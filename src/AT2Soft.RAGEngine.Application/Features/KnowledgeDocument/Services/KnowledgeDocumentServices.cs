@@ -2,7 +2,7 @@ using AT2Soft.Application.Result;
 using AT2Soft.RAGEngine.Application.Abstractions.DTOs;
 using AT2Soft.RAGEngine.Application.Abstractions.TextChunker;
 using AT2Soft.RAGEngine.Application.Interfaces;
-using AT2Soft.RAGEngine.Application.Interfaces.Repositories;
+using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 using AT2Soft.RAGEngine.Domain.Enums;
 using AT2Soft.RAGEngine.Domain.Interfaces.Services;
