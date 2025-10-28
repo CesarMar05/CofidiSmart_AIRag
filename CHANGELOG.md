@@ -6,6 +6,12 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.2.0 MVP] 2025-10-23
+### Added
+- Se agrega EndPoint de para establecer el promopt para ApplicationClient
+
+---
+
 ## [0.1.1 MVP]
 ### Added
 - Se agreaga Prompt a ApplicationClient para poder personalizar el Prompt por Aplicación.
@@ -24,7 +30,6 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 - MVP Versión inicial: estructura básica, carga de documentos, generación de embeddings y consulta a modelo vía LangChain.
 
 ---
-
 
 ## [Unreleased]
 ### Added
@@ -46,7 +51,6 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 - (Ejemplo) Ajustes relacionados con seguridad o dependencias críticas.
 
 ---
-
 
 ## Convenciones de Versionado
 
