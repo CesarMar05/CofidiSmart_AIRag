@@ -52,4 +52,18 @@ public class ApplicationClientController : ControllerBase
             ? Ok(rslt.Value)
             : BadRequest(rslt.Error);
     }
+
+    [Authorize(Policy = ScopePolicies.Admin)]
+    [HttpPost("{applicationId}/prompt")]
+    public async Task<IActionResult> ApplicationSetPrompt(Guid applicationId, [FromBody] string prompt, CancellationToken cancellationToken)
+    {
+        var query = new ApplicationCltSetPromptCommand(applicationId, prompt);
+        var rslt = await _mediator.Send(query, cancellationToken);
+
+        return rslt.IsSuccess
+            ? Ok()
+            : rslt.Error.Code.Contains("NotFound", StringComparison.InvariantCultureIgnoreCase)
+                ? NotFound($"No se localizó el ApplicacionClient con Id {applicationId}")
+                : BadRequest(rslt.Error);
+    }
 }
