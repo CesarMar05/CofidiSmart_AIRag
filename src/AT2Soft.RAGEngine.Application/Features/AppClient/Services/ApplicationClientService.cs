@@ -78,4 +78,17 @@ public class ApplicationClientService : IApplicationClientService
     {
         return await _applicationClientRepository.ExistAdminAsync(cancellationToken);
     }
+
+    public async Task<Result> SetPrompt(Guid applicationClientd, string prompt, CancellationToken cancellationToken = default)
+    {
+        var found = await _applicationClientRepository.GetByIdAsync(applicationClientd, cancellationToken);
+        if (found == null)
+            return Result.Failure(new("ApplicationClientNotFound", $"No fue posible localizar Applicationclient"));
+
+        found.Prompt = prompt;
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
 }
