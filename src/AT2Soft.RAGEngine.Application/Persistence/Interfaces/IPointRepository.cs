@@ -7,6 +7,6 @@ public interface IPointRepository
 {
     Task InsertAsync(List<Point> points, CancellationToken cancellationToken = default);
 
-    Task<List<VectorialSearchResult>> SearchSimilarTextsAsync(Guid appId, string TenantId, float[] vector, int limit, CancellationToken cancellationToken = default);
+    Task<List<VectorialSearchResult>> SearchSimilarTextsAsync(Guid appId, string tenant, IReadOnlyList<string> divisions, float[] vector, int limit, CancellationToken cancellationToken = default);
 
 }

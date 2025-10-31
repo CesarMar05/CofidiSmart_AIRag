@@ -13,6 +13,7 @@ public class RAGSqlServerDbContext : DbContext
     public DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
     public DbSet<Chunk> Chunks => Set<Chunk>();
     public DbSet<RagIngestJob> RagIngestJobs => Set<RagIngestJob>();
+    public DbSet<ApplicationClientPrompt> ApplicationClientPrompts => Set<ApplicationClientPrompt>();
 
 
 
@@ -25,5 +26,6 @@ public class RAGSqlServerDbContext : DbContext
         modelBuilder.ApplyConfiguration(new KnowledgeDocumentConfiguration());
         modelBuilder.ApplyConfiguration(new ChunkConfiguration());
         modelBuilder.ApplyConfiguration(new RagIngestJobConfiguration());
+        modelBuilder.ApplyConfiguration(new ApplicationClientPromptConfiguration());
     }
 }

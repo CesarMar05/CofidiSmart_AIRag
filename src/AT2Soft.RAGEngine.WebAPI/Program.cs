@@ -5,12 +5,17 @@ using AT2Soft.RAGEngine.Infrastructure.SQLServer;
 using AT2Soft.RAGEngine.WebAPI;
 using AT2Soft.RAGEngine.Infrastructure;
 using AT2Soft.RAGEngine.WebAPI.BackgroundServices;
+using AT2Soft.RAGEngine.WebAPI.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Leer cadena de conexión
 var relationalCnt = builder.Configuration.MustHaveConnectionString("RelationalDb");
 var vectorialCnt = builder.Configuration.MustHaveConnectionString("VectorialDb");
+
+builder.Services.AddRAGHealthChecks(builder.Configuration);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -45,6 +50,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app. MapHealthChecks("/_health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.MapControllers();
 

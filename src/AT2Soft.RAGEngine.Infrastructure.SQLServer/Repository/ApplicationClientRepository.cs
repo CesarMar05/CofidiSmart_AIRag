@@ -25,4 +25,14 @@ public class ApplicationClientRepository(RAGSqlServerDbContext context) : Reposi
         return await _context.ApplicationClients
             .FirstOrDefaultAsync(ac => ac.Name == name, cancellationToken);
     }
+
+    public async Task<string> GetPrompt(Guid appCltId, string tenant)
+    {
+        var found = await _context.ApplicationClientPrompts
+            .FirstOrDefaultAsync(acp => acp.ApplicationClientId == appCltId && acp.Tenant == tenant);
+
+        return found != null
+            ? found.Prompt
+            : string.Empty;
+    }
 }
