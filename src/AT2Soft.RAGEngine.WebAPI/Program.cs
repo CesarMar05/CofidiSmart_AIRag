@@ -5,12 +5,19 @@ using AT2Soft.RAGEngine.Infrastructure.SQLServer;
 using AT2Soft.RAGEngine.WebAPI;
 using AT2Soft.RAGEngine.Infrastructure;
 using AT2Soft.RAGEngine.WebAPI.BackgroundServices;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Leer cadena de conexión
 var relationalCnt = builder.Configuration.MustHaveConnectionString("RelationalDb");
 var vectorialCnt = builder.Configuration.MustHaveConnectionString("VectorialDb");
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
+
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -38,6 +45,18 @@ builder.Services.AddHostedService<RagIngestWorker>();
 
 var app = builder.Build();
 
+// Middleware de logging de requests de Serilog (útil y muy barato)
+app.UseSerilogRequestLogging(options =>
+{
+    // Ejemplo: añade duración, método, ruta y status code
+    options.EnrichDiagnosticContext = (diagCtx, httpCtx) =>
+    {
+        diagCtx.Set("ClientIP", httpCtx.Connection.RemoteIpAddress?.ToString());
+        diagCtx.Set("UserAgent", httpCtx.Request.Headers.UserAgent.ToString());
+    };
+});
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -48,4 +67,17 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    Log.Information("Arrancando Web API");
+    
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
