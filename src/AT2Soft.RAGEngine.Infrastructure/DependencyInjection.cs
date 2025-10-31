@@ -3,6 +3,7 @@ using AT2Soft.RAGEngine.Application.Abstractions.TextChunker;
 using AT2Soft.RAGEngine.Application.Abstractions.TextExtractor;
 using AT2Soft.RAGEngine.Domain.Interfaces.Services;
 using AT2Soft.RAGEngine.Infrastructure.AIModel;
+using AT2Soft.RAGEngine.Infrastructure.AIModel.DelegatingHandlers;
 using AT2Soft.RAGEngine.Infrastructure.AIModel.Models;
 using AT2Soft.RAGEngine.Infrastructure.Embedding;
 using AT2Soft.RAGEngine.Infrastructure.Queue;
@@ -45,13 +46,15 @@ public static class DependencyInjection
             .Validate(o => !string.IsNullOrWhiteSpace(o.EmbeddingModel), "Ollama:EmbeddingModel es requerido")
             .ValidateOnStart();
 
-
+        services.AddTransient<HttpLoggingHandler>();
+        
         services.AddRefitClient<IOllamaClient>()
             .ConfigureHttpClient((sp, c) =>
             {
                 var opts = sp.GetRequiredService<IOptions<OllamaOptions>>().Value;
                 c.BaseAddress = new Uri(opts.BaseUrl);
-            });
+            })
+            .AddHttpMessageHandler<HttpLoggingHandler>();
 
         services.AddScoped<IAIModelService, OllamaService>();
         return services;
