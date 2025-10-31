@@ -12,5 +12,5 @@ public interface IApplicationClientService
     Task<Result<ApplicationClientInfo?>> FindByNameAsync(string name, CancellationToken cancellationToken = default);
     Task<Result<List<ApplicationClient>>> GetListAppClient(CancellationToken cancellationToken = default);
     Task<Result<bool>> ExistAdmin(CancellationToken cancellationToken = default);
-    Task<Result> SetPrompt(Guid applicationClientd, string prompt, CancellationToken cancellationToken = default);
+    Task<Result> SetPrompt(Guid applicationClientd, string tenant, string prompt, CancellationToken cancellationToken = default);
 }

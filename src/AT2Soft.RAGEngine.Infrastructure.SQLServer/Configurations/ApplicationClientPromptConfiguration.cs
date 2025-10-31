@@ -23,5 +23,7 @@ public class ApplicationClientPromptConfiguration : IEntityTypeConfiguration<App
         builder.Property(a => a.Prompt)
             .IsRequired();
 
+        builder.HasIndex(e => new { e.ApplicationClientId, e.Tenant })
+            .IsUnique();
     }
 }

@@ -56,7 +56,7 @@ internal sealed class ChatAskCommandHandler : IRequestHandler<ChatAskCommand, Re
 
             if (context.Count > 0)
             {
-                fullprompt = await _promptServices.GetPrompt(applicationId, request.Question, context, cancellationToken);
+                fullprompt = await _promptServices.GetPrompt(applicationId, _clientContext.Tenant, request.Question, context, cancellationToken);
                 usedRag = true;
             }
         }
