@@ -73,6 +73,7 @@ public class IngestTextService : IIngestTextService
             List<Point> points = [];
             foreach (var c in kdChunks)
             {
+                _log.LogDebug("Embedding Chunk {position} \n{content}", c.Position, c.Content);
                 var embedding = await _ollamaService.EmbeddingTextAsync(c.Content, cancellationToken);
                 var point = new Point
                 {

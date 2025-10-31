@@ -4,14 +4,6 @@ namespace AT2Soft.RAGEngine.WebAPI.BackgroundServices;
 
 public class RagIngestWorker : BackgroundService
 {
-    //private readonly IBackgroundTaskQueue _queue;
-    //private readonly IServiceProvider _sp;
-
-    //public RagIngestWorker(IBackgroundTaskQueue queue, IServiceProvider sp)
-    //{
-    //    _queue = queue; _sp = sp;
-    //}
-
     private readonly IBackgroundTaskQueue _queue;
     private readonly IServiceProvider _rootProvider;
     private readonly ILogger<RagIngestWorker> _logger;
@@ -25,23 +17,6 @@ public class RagIngestWorker : BackgroundService
         _rootProvider = rootProvider;
         _logger = logger;
     }
-
-
-    //protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    //{
-        //while (!stoppingToken.IsCancellationRequested)
-        //{
-            //var work = await _queue.DequeueAsync(stoppingToken);
-            //try
-            //{
-                //await work(stoppingToken);
-            //}
-            //catch
-            //{
-                /* log */
-            //}
-        //}
-    //}
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
