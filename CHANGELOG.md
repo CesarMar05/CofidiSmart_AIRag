@@ -6,6 +6,12 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.2.2 MVP] 2025-10-31
+### Added
+- Se agrega variable de cantidad maxima para chunks
+
+---
+
 ## [0.1.2.1 MVP] 2025-10-30
 ### Added
 - Se agrega uso de Serolog para la generación de log diario en archivo
