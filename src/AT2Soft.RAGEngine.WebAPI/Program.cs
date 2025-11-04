@@ -51,8 +51,8 @@ app.UseSerilogRequestLogging(options =>
     // Ejemplo: añade duración, método, ruta y status code
     options.EnrichDiagnosticContext = (diagCtx, httpCtx) =>
     {
-        diagCtx.Set("ClientIP", httpCtx.Connection.RemoteIpAddress?.ToString());
-        diagCtx.Set("UserAgent", httpCtx.Request.Headers.UserAgent.ToString());
+        diagCtx.Set("ClientIP", httpCtx.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        diagCtx.Set("UserAgent", httpCtx.Request.Headers.UserAgent.ToString() ?? string.Empty);
     };
 });
 

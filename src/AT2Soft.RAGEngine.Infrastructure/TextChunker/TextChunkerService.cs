@@ -4,7 +4,7 @@ using AT2Soft.RAGEngine.Application.Abstractions.TextChunker;
 
 namespace AT2Soft.RAGEngine.Infrastructure.Embedding;
 
-public class TextChunkerService : ITextChunkerService
+public class TextChunkerServiceOld : ITextChunkerService
 {
     // Estimación simple: ~1.3 tokens por palabra (suele funcionar bien con ES/EN)
     private static int EstimateTokens(string text)
@@ -24,7 +24,7 @@ public class TextChunkerService : ITextChunkerService
         return parts.Count > 0 ? parts : [text];
     }
 
-    public  List<ChunkResult> Chunk(string text, TextChunkerOptions opt)
+    public List<ChunkResult> Chunk(string text, TextChunkerOptions opt)
     {
         var sentences = SplitSentences(text);
         var chunks = new List<ChunkResult>();
@@ -110,4 +110,166 @@ public class TextChunkerService : ITextChunkerService
 
     private static ChunkResult MakeChunk(List<string> words, int idx, int estimatedTokens)
         => new(idx, string.Join(" ", words), estimatedTokens);
+}
+
+
+public class TextChunkerService : ITextChunkerService
+{
+    public List<ChunkResult> Chunk(string text, TextChunkerOptions opt)
+    {
+        text = NormalizeText(text);
+
+        var sentences = SplitSentences(text);
+        var chunks = new List<ChunkResult>();
+        var buffer = new List<string>();
+        int bufferTokens = 0;
+        int bufferChars = 0;
+        int idx = 0;
+
+        foreach (var sentence in sentences)
+        {
+            if (string.IsNullOrWhiteSpace(sentence)) continue;
+
+            var sentTokens = EstimateTokens(sentence);
+            var sentChars = sentence.Length;
+
+            // Si una sola frase excede MaxTokens -> troceo por palabras
+            if (sentTokens > opt.MaxTokens || sentChars > opt.MaxChars)
+            {
+                FlushBufferIfNeeded(chunks, ref buffer, ref bufferTokens, ref bufferChars, ref idx, opt);
+
+                foreach (var hard in HardSplitByWords(sentence, opt))
+                    chunks.Add(new ChunkResult(idx++, hard.text, hard.tokens));
+
+                continue;
+            }
+
+            // Intentar agregar al buffer
+            if (bufferTokens + sentTokens <= opt.TargetTokens &&
+                bufferChars + sentChars <= opt.MaxChars)
+            {
+                buffer.Add(sentence);
+                bufferTokens += sentTokens;
+                bufferChars += sentChars;
+            }
+            else
+            {
+                // cerrar chunk actual con overlap
+                FlushBufferIfNeeded(chunks, ref buffer, ref bufferTokens, ref bufferChars, ref idx, opt, force:true);
+
+                // iniciar buffer con la frase actual
+                buffer.Add(sentence);
+                bufferTokens = sentTokens;
+                bufferChars = sentChars;
+            }
+        }
+
+        FlushBufferIfNeeded(chunks, ref buffer, ref bufferTokens, ref bufferChars, ref idx, opt, force:true);
+        return chunks;
+    }
+
+    private static string NormalizeText(string text)
+    {
+        // Normaliza “ . ”, múltiples espacios y puntos suspensivos
+        var s = text.Replace("\r\n", "\n");
+        s = Regex.Replace(s, @"\s*\.\s*", ". ");     // colapsa " . " -> ". "
+        s = Regex.Replace(s, @"\.{3,}", "… ");       // “...” -> “…” + espacio
+        s = Regex.Replace(s, @"[ \t]{2,}", " ");     // espacios múltiples
+        s = Regex.Replace(s, @"\n{3,}", "\n\n");     // demasiados saltos de línea
+        return s.Trim();
+    }
+
+    private static IReadOnlyList<string> SplitSentences(string text)
+    {
+        // Divide por fin de oración: . ! ? … seguidos de espacio o fin de línea
+        var parts = Regex.Split(text, @"(?<=[\.!\?…])\s+");
+        // Limpia elementos vacíos o mínimos
+        return parts.Select(p => p.Trim())
+                    .Where(p => p.Length > 0)
+                    .ToList();
+    }
+
+    // Heurística: ~1 token ≈ 3.8 chars (mezcla en/es)
+    private static int EstimateTokens(string s)
+        => (int)Math.Ceiling(s.Length / 3.8);
+
+    private static IEnumerable<(string text, int tokens)> HardSplitByWords(string sentence, TextChunkerOptions opt)
+    {
+        var words = Regex.Split(sentence.Trim(), @"\s+")
+                        .Where(w => w.Length > 0)
+                        .ToList();
+
+        var curr = new List<string>();
+        int currTokens = 0;
+
+        foreach (var w in words)
+        {
+            int wTok = EstimateTokens(w.Length <= 20 ? w : w[..20]); // bound simple
+            if (currTokens + wTok > opt.MaxTokens && curr.Count > 0)
+            {
+                var text = string.Join(" ", curr);
+                yield return (text, EstimateTokens(text));
+
+                // overlap por tokens
+                var keepTokens = Math.Max(0, opt.OverlapTokens);
+                curr = TakeTailByTokens(curr, keepTokens).ToList();
+                currTokens = EstimateTokens(string.Join(" ", curr));
+            }
+            curr.Add(w);
+            currTokens += wTok;
+        }
+
+        if (curr.Count > 0)
+        {
+            var text = string.Join(" ", curr);
+            yield return (text, EstimateTokens(text));
+        }
+    }
+
+    private static IEnumerable<string> TakeTailByTokens(List<string> words, int tokenBudget)
+    {
+        // toma desde el final hasta cubrir tokenBudget aprox.
+        int sum = 0;
+        for (int i = words.Count - 1; i >= 0; i--)
+        {
+            sum += EstimateTokens(words[i]);
+            if (sum >= tokenBudget) return words.Skip(i);
+        }
+        return words; // si no alcanza, devuelve todo
+    }
+
+    private static void FlushBufferIfNeeded(
+        List<ChunkResult> chunks,
+        ref List<string> buffer,
+        ref int bufferTokens,
+        ref int bufferChars,
+        ref int idx,
+        TextChunkerOptions opt,
+        bool force = false)
+    {
+        if ((force && buffer.Count > 0) ||
+            bufferTokens >= opt.TargetTokens ||
+            bufferChars >= opt.MaxChars)
+        {
+            var text = string.Join(" ", buffer).Trim();
+            if (text.Length > 0)
+            {
+                var tokens = EstimateTokens(text);
+                chunks.Add(new ChunkResult(idx++, text, tokens));
+
+                // overlap a nivel de oraciones (con presupuesto en tokens)
+                var keep = TakeTailByTokens(buffer, opt.OverlapTokens).ToList();
+                buffer = keep;
+                var keepText = string.Join(" ", buffer);
+                bufferTokens = EstimateTokens(keepText);
+                bufferChars = keepText.Length;
+            }
+            else
+            {
+                buffer.Clear();
+                bufferTokens = 0;
+                bufferChars = 0;
+            }
+        }
+    }
 }
