@@ -6,6 +6,12 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.2.2 MVP] 2025-10-31
+### Added
+- Se agrega variable de cantidad maxima para chunks
+
+---
+
 ## [0.1.3.0 MVP] 2025-10-31
 ### Added
 - Se agrega Controller de HealthChecks para verivicar servicios de:
