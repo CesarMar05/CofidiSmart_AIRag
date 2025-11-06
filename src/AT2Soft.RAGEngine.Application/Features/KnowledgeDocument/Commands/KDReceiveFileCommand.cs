@@ -8,7 +8,7 @@ using MediatR;
 
 namespace AT2Soft.RAGEngine.Application.Features.KnowledgeDocument.Commands;
 
-public sealed record KDReceiveFileCommand(Guid ApplicationId, KDMetadataRequest Metadata, TextChunkerOptions TextChunkerOptions, string FilaName, Stream FileContent): IRequest<Result<Guid>>;
+public sealed record KDReceiveFileCommand(KDMetadataRequest Metadata, TextChunkerOptions TextChunkerOptions, string FilaName, Stream FileContent): IRequest<Result<Guid>>;
 
 internal class KDReceiveFileCommandHandler : IRequestHandler<KDReceiveFileCommand, Result<Guid>>
 {
@@ -41,7 +41,6 @@ internal class KDReceiveFileCommandHandler : IRequestHandler<KDReceiveFileComman
             };
 
             return await _ragIngestJobServices.AddRagIngestJob(
-                request.ApplicationId,
                 request.Metadata,
                 request.TextChunkerOptions,
                 sourceType,

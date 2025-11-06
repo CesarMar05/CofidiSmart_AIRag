@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Domain.Entities;
 using AT2Soft.RAGEngine.Domain.Models;
@@ -25,9 +26,7 @@ public class PointRepository : IPointRepository
         {
             var request = new QdrantPointsRequest
             {
-                Points = points
-                    .Select(p => new QdrantPoint<Payload> { Id = p.Id, Vector = p.Vector, Payload = p.Payload })
-                    .ToList()
+                Points = [.. points.Select(p => new QdrantPoint<Payload> { Id = p.Id, Vector = p.Vector, Payload = p.Payload })]
             };
 
             var result = await _qdrantApiClient.PointInsert(_context.Collection, request);
@@ -42,7 +41,7 @@ public class PointRepository : IPointRepository
         }
     }
 
-    public async Task<List<VectorialSearchResult>> SearchSimilarTextsAsync(Guid appId, string TenantId, float[] vector, int limit, CancellationToken cancellationToken = default)
+    public async Task<List<VectorialSearchResult>> SearchSimilarTextsAsync(Guid appId, string tenant, IReadOnlyList<string> divisions, float[] vector, int limit, CancellationToken cancellationToken = default)
     {
         QdrantResponse<List<QdrantSearchResult<Payload>>?>? result = new();
         try
@@ -51,10 +50,19 @@ public class PointRepository : IPointRepository
             {
                 Must =
                 [
-                    new FieldCondition("application", new MatchValue(appId.ToString())),
-                    new FieldCondition("tenant", new MatchValue(TenantId))
-                ]  
+                    FieldCondition.Value("application", appId.ToString()),
+                    FieldCondition.Value("tenant", tenant)
+                ]
             };
+
+            if (divisions.Count > 0)
+            {
+                filter.Should = [
+                    FieldCondition.Any("divisions", [.. divisions]),
+                    FieldCondition.IsEmptyField("divisions")
+                ];
+            }
+                var filterjson = JsonSerializer.Serialize(filter);
 
             var request = new QdrantSearchRequest { Limit = limit, WithPayload = true, Vector = vector, WithVector = false, Filter = filter };
             result = await _qdrantApiClient.PointSearch(_context.Collection, request);
@@ -62,9 +70,7 @@ public class PointRepository : IPointRepository
             if (result == null || result.Result == null)
                 return [];
 
-            return result.Result
-                .Select(r => new VectorialSearchResult(r.Id, r.Version, r.Score, r.Payload))
-                .ToList();
+            return [.. result.Result.Select(r => new VectorialSearchResult(r.Id, r.Version, r.Score, r.Payload))];
         }
         catch (ApiException ex)
         {

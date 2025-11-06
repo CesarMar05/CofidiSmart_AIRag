@@ -87,7 +87,8 @@ public class IngestTextService : IIngestTextService
                         Tags = metadata.Tags,
                         KnowledgeDocumentId = c.KDId,
                         Position = c.Position,
-                        Text = c.Content
+                        Text = c.Content,
+                        Divisions = metadata.Divisions ?? []
                     }
                 };
 
@@ -107,7 +108,7 @@ public class IngestTextService : IIngestTextService
                 ApplicationClientId = job.ApplicationId,
                 TenantId = job.TenantId,
                 Topic = metadata.Topic,
-                Tags = metadata.Tags,
+                Tags = metadata.Tags.ToList(),
                 Source = job.Source,
                 Title = metadata.Title,
                 Description = metadata.Description,

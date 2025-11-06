@@ -9,7 +9,7 @@ using MediatR;
 
 namespace AT2Soft.RAGEngine.Application.Features.KnowledgeDocument.Commands;
 
-public sealed record KDReceiveUrlCommand(Guid ApplicationId, KDMetadataRequest Metadata, TextChunkerOptions TextChunkerOptions, string Url) : IRequest<Result<Guid>>;
+public sealed record KDReceiveUrlCommand(KDMetadataRequest Metadata, TextChunkerOptions TextChunkerOptions, string Url) : IRequest<Result<Guid>>;
 
 internal class KDReceiveUrlCommandHandler : IRequestHandler<KDReceiveUrlCommand, Result<Guid>>
 {
@@ -34,7 +34,6 @@ internal class KDReceiveUrlCommandHandler : IRequestHandler<KDReceiveUrlCommand,
 
         // Paso 3: insertar JOB
         return await _ragIngestJobServices.AddRagIngestJob(
-            request.ApplicationId,
             request.Metadata,
             request.TextChunkerOptions,
             KnowledgeDocumentType.URL,

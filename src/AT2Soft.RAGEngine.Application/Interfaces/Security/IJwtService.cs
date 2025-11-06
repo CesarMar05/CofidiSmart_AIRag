@@ -6,5 +6,5 @@ namespace AT2Soft.RAGEngine.Application.Interfaces.Security;
 
 public interface IJwtService
 {
-    TokenResponse GenerateToken(Guid appId, string scope);
+    TokenResponse GenerateToken(Guid appId, string userId, string tenant, IReadOnlyList<string> divisions, string scope);
 }

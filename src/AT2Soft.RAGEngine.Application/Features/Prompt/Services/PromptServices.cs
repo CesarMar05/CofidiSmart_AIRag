@@ -13,13 +13,17 @@ public class PromptServices : IPromptServices
         _applicationClientRepository = applicationClientRepository;
     }
 
-    public async Task<string> GetPrompt(Guid applicationId, string query, List<string> contextChunks, CancellationToken cancellationToken = default)
+    public async Task<string> GetPrompt(Guid applicationId, string tenant, string query, List<string> contextChunks, CancellationToken cancellationToken = default)
     {
         var context = string.Join("\n", contextChunks);
 
-        var prompt = await _applicationClientRepository.GetOneAsync<string>(
-            predicate: ac => ac.ApplicationClientId == applicationId,
-            selector: ac => ac.Prompt
+        var acrc = await _applicationClientRepository.GetApplicationClientRAGConfig(applicationId, tenant, cancellationToken);
+
+        var prompt = acrc != null && !string.IsNullOrWhiteSpace(acrc.Prompt)
+            ? acrc.Prompt
+            : await _applicationClientRepository.GetOneAsync(
+                predicate: ac => ac.ApplicationClientId == applicationId,
+                selector: ac => ac.Prompt
         );
 
         return string.IsNullOrEmpty(prompt)

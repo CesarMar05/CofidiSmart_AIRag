@@ -1,6 +1,6 @@
 using AT2Soft.Application.Result;
+using AT2Soft.RAGEngine.Application.Abstractions.Authentication;
 using AT2Soft.RAGEngine.Application.Abstractions.WebApiDTOs;
-using AT2Soft.RAGEngine.Application.Features.Prompt.Functions;
 using AT2Soft.RAGEngine.Application.Features.Prompt.Interfaces;
 using AT2Soft.RAGEngine.Application.Interfaces;
 using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
@@ -10,7 +10,7 @@ using MediatR;
 namespace AT2Soft.RAGEngine.Application.Features.Chat.Commands;
 
 
-public sealed record ChatAskCommand(Guid ApplicationId, string Tenant, string Question, bool SearchContext = true) : IRequest<Result<ChatAskResponse>>;
+public sealed record ChatAskCommand(string Question, bool SearchContext) : IRequest<Result<ChatAskResponse>>;
 
 internal sealed class ChatAskCommandHandler : IRequestHandler<ChatAskCommand, Result<ChatAskResponse>>
 {
@@ -18,19 +18,27 @@ internal sealed class ChatAskCommandHandler : IRequestHandler<ChatAskCommand, Re
     private readonly IPointRepository _pointRepository;
     private readonly IKnowledgeDocumentServices _kdServices;
     private readonly IPromptServices _promptServices;
+    private readonly IClientContext _clientContext;
 
-    public ChatAskCommandHandler(IAIModelService ollamaService, IPointRepository pointRepository, IKnowledgeDocumentServices kdServices, IPromptServices promptServices)
+
+    public ChatAskCommandHandler(IAIModelService ollamaService, IPointRepository pointRepository, IKnowledgeDocumentServices kdServices, IPromptServices promptServices, IClientContext clientcontext)
     {
         _ollamaService = ollamaService;
         _pointRepository = pointRepository;
         _kdServices = kdServices;
         _promptServices = promptServices;
+        _clientContext = clientcontext;
     }
 
     public async Task<Result<ChatAskResponse>> Handle(ChatAskCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(_clientContext.ClientId)|| string.IsNullOrWhiteSpace(_clientContext.Tenant))
+            return  Result.Failure<ChatAskResponse>(new("Unauthorized", "Invalid Token"));
+
         if (string.IsNullOrWhiteSpace(request.Question))
             return Result.Failure<ChatAskResponse>(new("QuestionEmpty", "El prompt no puede estar vacío."));
+
+        Guid applicationId = new(_clientContext.ClientId);
 
         var embedding = await _ollamaService.EmbeddingTextAsync(request.Question, cancellationToken);
 
@@ -39,7 +47,7 @@ internal sealed class ChatAskCommandHandler : IRequestHandler<ChatAskCommand, Re
         if (request.SearchContext)
         {
             List<string> context = [];
-            var searchRslt = await _pointRepository.SearchSimilarTextsAsync(request.ApplicationId, request.Tenant, embedding, 5, cancellationToken);
+            var searchRslt = await _pointRepository.SearchSimilarTextsAsync(applicationId, _clientContext.Tenant, _clientContext.Divisions, embedding, 5, cancellationToken);
             foreach (var sr in searchRslt)
             {
                 if (sr.Payload != null)
@@ -48,7 +56,7 @@ internal sealed class ChatAskCommandHandler : IRequestHandler<ChatAskCommand, Re
 
             if (context.Count > 0)
             {
-                fullprompt = await _promptServices.GetPrompt(request.ApplicationId, request.Question, context, cancellationToken);
+                fullprompt = await _promptServices.GetPrompt(applicationId, _clientContext.Tenant, request.Question, context, cancellationToken);
                 usedRag = true;
             }
         }

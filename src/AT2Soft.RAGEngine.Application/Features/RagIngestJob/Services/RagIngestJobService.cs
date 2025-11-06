@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AT2Soft.Application.Result;
+using AT2Soft.RAGEngine.Application.Abstractions.Authentication;
 using AT2Soft.RAGEngine.Application.Abstractions.DTOs;
 using AT2Soft.RAGEngine.Application.Abstractions.KnowledgeDocument;
 using AT2Soft.RAGEngine.Application.Abstractions.Queue;
@@ -20,17 +21,35 @@ public class RagIngestJobServices : IRagIngestJobServices
     private readonly IRagIngestJobRepository _ragIngestJobRepository;
     private readonly IUnitOfWorkRelational _unitOfWorkRelational;
     private readonly IBackgroundTaskQueue _queue;
+    private readonly IClientContext _clientContext;
 
 
-    public RagIngestJobServices(IRagIngestJobRepository ragIngestJobRepository, IUnitOfWorkRelational unitOfWorkRelational, IBackgroundTaskQueue queue)
+    public RagIngestJobServices(IRagIngestJobRepository ragIngestJobRepository, IUnitOfWorkRelational unitOfWorkRelational, IBackgroundTaskQueue queue, IClientContext clientContext)
     {
         _ragIngestJobRepository = ragIngestJobRepository;
         _unitOfWorkRelational = unitOfWorkRelational;
         _queue = queue;
+        _clientContext = clientContext;
     }
 
-    public async Task<Result<Guid>> AddRagIngestJob(Guid applicationId, KDMetadataRequest metadata, TextChunkerOptions textChunkerOptions, KnowledgeDocumentType sourceType, string source, string text, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid>> AddRagIngestJob(KDMetadataRequest metadata, TextChunkerOptions textChunkerOptions, KnowledgeDocumentType sourceType, string source, string text, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(_clientContext.ClientId) || string.IsNullOrWhiteSpace(_clientContext.Tenant))
+            return Result.Failure<Guid>(new("Unauthorized", $"Token no válido"));
+
+        if (_clientContext.Tenant != metadata.TenantId)
+            return Result.Failure<Guid>(new("Unauthorized", $"Token no tiene autorización para el tenant {metadata.TenantId} válido"));
+
+        if (_clientContext.Divisions.Count > 0)
+        {
+            if (metadata.Divisions == null || metadata.Divisions.Count == 0)
+                return Result.Failure<Guid>(new("Unauthorized", $"Token no tiene autorización para hacer ingest de documentos sin division"));
+            if (!metadata.Divisions.All(d => _clientContext.Divisions.Contains(d)))
+                return Result.Failure<Guid>(new("Unauthorized", $"Token no tiene autorización para hacer ingest de las divisiones {string.Join(" ",metadata.Divisions)}"));
+        }
+
+        Guid applicationId = new(_clientContext.ClientId);
+
         var digest = GetHashBase64(text, HashType);
         var exist = await _ragIngestJobRepository.ExistDigest(applicationId, digest, cancellationToken);
         if (exist)
@@ -40,7 +59,7 @@ public class RagIngestJobServices : IRagIngestJobServices
         {
             Id = Guid.NewGuid(),
             ApplicationId = applicationId,
-            TenantId = metadata.TenantId,
+            TenantId = _clientContext.Tenant,
             Metadata = JsonSerializer.Serialize(metadata),
             SourceType = sourceType,
             Source = source,
@@ -74,16 +93,22 @@ public class RagIngestJobServices : IRagIngestJobServices
         return entity.Id;
     }
 
-    public async Task<Result<RagIngestJobInfo>> GetRagIngestJobInfo(Guid appId,  string tenantId, Guid jobId, CancellationToken cancellationToken)
+    public async Task<Result<RagIngestJobInfo>> GetRagIngestJobInfo(Guid jobId, CancellationToken cancellationToken)
     {
-        var found = await _ragIngestJobRepository.FindRagIngestJobInfoByIdAsync(appId, tenantId, jobId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(_clientContext.ClientId) || string.IsNullOrWhiteSpace(_clientContext.Tenant))
+            return Result.Failure<RagIngestJobInfo>(new("Unauthorized", $"Token no válido"));
+            
+        var found = await _ragIngestJobRepository.FindRagIngestJobInfoByIdAsync(new Guid(_clientContext.ClientId), _clientContext.Tenant, jobId, cancellationToken);
         return found
             ?? Result.Failure<RagIngestJobInfo>(new("RagIngestJobInfoNotFound", $"No se localizo el Job con id {jobId}"));
     }
 
-    public async Task<Result<List<RagIngestJobInfo>>> GetRagIngestJobInfoList(Guid appId, string tenantId, CancellationToken cancellationToken)
+    public async Task<Result<List<RagIngestJobInfo>>> GetRagIngestJobInfoList(CancellationToken cancellationToken)
     {
-        var list = await _ragIngestJobRepository.GetRagIngestJobInfoListAsync(appId, tenantId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(_clientContext.ClientId) || string.IsNullOrWhiteSpace(_clientContext.Tenant))
+            return Result.Failure<List<RagIngestJobInfo>>(new("Unauthorized", $"Token no válido"));
+
+        var list = await _ragIngestJobRepository.GetRagIngestJobInfoListAsync(new Guid(_clientContext.ClientId), _clientContext.Tenant, cancellationToken);
         return list.ToList();
     }
 }
