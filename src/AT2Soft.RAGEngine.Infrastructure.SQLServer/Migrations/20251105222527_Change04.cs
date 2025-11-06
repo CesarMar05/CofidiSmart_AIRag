@@ -12,22 +12,26 @@ namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ApplicationClientPrompts",
+                name: "ApplicationClientRAGConfigs",
                 columns: table => new
                 {
                     ApplicationClientPromptId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ApplicationClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Tenant = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Prompt = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Prompt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetTokens = table.Column<int>(type: "int", nullable: false),
+                    MaxTokens = table.Column<int>(type: "int", nullable: false),
+                    MinTokens = table.Column<int>(type: "int", nullable: false),
+                    OverlapTokens = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationClientPrompts", x => x.ApplicationClientPromptId);
+                    table.PrimaryKey("PK_ApplicationClientRAGConfigs", x => x.ApplicationClientPromptId);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationClientPrompts_ApplicationClientId_Tenant",
-                table: "ApplicationClientPrompts",
+                name: "IX_ApplicationClientRAGConfigs_ApplicationClientId_Tenant",
+                table: "ApplicationClientRAGConfigs",
                 columns: new[] { "ApplicationClientId", "Tenant" },
                 unique: true);
         }
@@ -36,7 +40,7 @@ namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationClientPrompts");
+                name: "ApplicationClientRAGConfigs");
         }
     }
 }

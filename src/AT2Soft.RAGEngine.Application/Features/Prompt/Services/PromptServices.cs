@@ -17,10 +17,10 @@ public class PromptServices : IPromptServices
     {
         var context = string.Join("\n", contextChunks);
 
-        var acp = await _applicationClientRepository.GetApplicationClientPrompt(applicationId, tenant, cancellationToken);
+        var acrc = await _applicationClientRepository.GetApplicationClientRAGConfig(applicationId, tenant, cancellationToken);
 
-        var prompt = acp != null && !string.IsNullOrWhiteSpace(acp.Prompt)
-            ? acp.Prompt
+        var prompt = acrc != null && !string.IsNullOrWhiteSpace(acrc.Prompt)
+            ? acrc.Prompt
             : await _applicationClientRepository.GetOneAsync(
                 predicate: ac => ac.ApplicationClientId == applicationId,
                 selector: ac => ac.Prompt

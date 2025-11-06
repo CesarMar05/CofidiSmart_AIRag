@@ -26,7 +26,6 @@ public class KDocumentController : ControllerBase
     public async Task<IActionResult> Search([FromBody] KDSearchQuery request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_clientContext.ClientId)) return Unauthorized();
-
         
         var rslt = await _mediator.Send(request, cancellationToken);
 

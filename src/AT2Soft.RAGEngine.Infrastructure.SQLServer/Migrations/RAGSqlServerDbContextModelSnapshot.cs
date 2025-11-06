@@ -57,7 +57,7 @@ namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Migrations
                     b.ToTable("ApplicationClients", (string)null);
                 });
 
-            modelBuilder.Entity("AT2Soft.RAGEngine.Domain.Entities.ApplicationClientPrompt", b =>
+            modelBuilder.Entity("AT2Soft.RAGEngine.Domain.Entities.ApplicationClientRAGConfig", b =>
                 {
                     b.Property<Guid>("ApplicationClientPromptId")
                         .ValueGeneratedOnAdd()
@@ -66,9 +66,21 @@ namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Migrations
                     b.Property<Guid>("ApplicationClientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("MaxTokens")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinTokens")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OverlapTokens")
+                        .HasColumnType("int");
+
                     b.Property<string>("Prompt")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TargetTokens")
+                        .HasColumnType("int");
 
                     b.Property<string>("Tenant")
                         .IsRequired()
@@ -80,7 +92,7 @@ namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Migrations
                     b.HasIndex("ApplicationClientId", "Tenant")
                         .IsUnique();
 
-                    b.ToTable("ApplicationClientPrompts", (string)null);
+                    b.ToTable("ApplicationClientRAGConfigs", (string)null);
                 });
 
             modelBuilder.Entity("AT2Soft.RAGEngine.Domain.Entities.Chunk", b =>

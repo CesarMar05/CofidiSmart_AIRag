@@ -7,6 +7,6 @@ public interface IApplicationClientRepository : IRepository<ApplicationClient, G
     Task<ApplicationClient?> GetFullDataByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ExistAdminAsync(CancellationToken cancellationToken = default);
     Task<ApplicationClient?> FindByName(string name, CancellationToken cancellationToken = default);
-    Task<ApplicationClientPrompt?> GetApplicationClientPrompt(Guid appCltId, string tenant, CancellationToken cancellationToken = default);
-    Task<ApplicationClientPrompt> AddApplicationClientPrompt(ApplicationClientPrompt acp, CancellationToken cancellationToken = default);
+    Task<ApplicationClientRAGConfig?> GetApplicationClientRAGConfig(Guid appCltId, string tenant, CancellationToken cancellationToken = default);
+    Task<ApplicationClientRAGConfig> AddApplicationClientRAGConfig(ApplicationClientRAGConfig acrc, CancellationToken cancellationToken = default);
 }

@@ -6,13 +6,7 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.1.2.2 MVP] 2025-10-31
-### Added
-- Se agrega variable de cantidad maxima para chunks
-
----
-
-## [0.1.3.0 MVP] 2025-10-31
+## [0.1.3.0 MVP] 2025-11-05
 ### Added
 - Se agrega Controller de HealthChecks para verivicar servicios de:
 
@@ -20,7 +14,13 @@ y el control de versiones se basa en [Semantic Versioning](https://semver.org/).
   - Persistencia Vectorial.
   - Consulta Modelo de Embedding.
   - Consulta Modelo de AI.
-- Se agega Prompt para ApplicactionClient/Tenant
+- Se agega Configuración de Prompt y ChunkerOptions para ApplicactionClient/Tenant
+
+---
+
+## [0.1.2.2 MVP] 2025-10-31
+### Added
+- Se agrega variable de cantidad maxima para chunks
 
 ---
 

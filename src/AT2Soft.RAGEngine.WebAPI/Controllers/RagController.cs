@@ -1,6 +1,7 @@
 using AT2Soft.RAGEngine.Application.Abstractions.KnowledgeDocument;
 using AT2Soft.RAGEngine.Application.Abstractions.TextChunker;
 using AT2Soft.RAGEngine.Application.Features.KnowledgeDocument.Commands;
+using AT2Soft.RAGEngine.Application.Features.TextChunkerOptionsFeature.Interfaces;
 using AT2Soft.RAGEngine.Application.Interfaces.Services;
 using AT2Soft.RAGEngine.WebAPI.Security;
 using MediatR;
@@ -15,18 +16,23 @@ public class RagController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IRagIngestJobServices _ragIngestJobServices;
+    private readonly ITextChunkerOptionsService _textChunkerOptionsSercvice;
 
-    public RagController(IMediator mediator, IRagIngestJobServices ragIngestJobServices)
+    public RagController(IMediator mediator, IRagIngestJobServices ragIngestJobServices, ITextChunkerOptionsService textChunkerOptionsSercvice)
     {
         _mediator = mediator;
         _ragIngestJobServices = ragIngestJobServices;
+        _textChunkerOptionsSercvice = textChunkerOptionsSercvice;
     }
 
     [Authorize(Policy = ScopePolicies.Ingest)]
     [HttpPost("ingest/text")]
     public async Task<IActionResult> Upload([FromBody] KDReceiveTextRequest request, CancellationToken cancellationToken)
     {
-        var command = new KDReceiveTextCommand(request.Metadata, request.TextChunkerOptions ?? new TextChunkerOptions(), request.Text);
+        var tco = request.TextChunkerOptions
+            ?? await _textChunkerOptionsSercvice.GetTextChunkerOptions(cancellationToken);
+            
+        var command = new KDReceiveTextCommand(request.Metadata, tco, request.Text);
         var rslt = await _mediator.Send(command, cancellationToken);
 
         return rslt.IsSuccess
@@ -43,10 +49,13 @@ public class RagController : ControllerBase
     public async Task<IActionResult> UploadFile([FromBody] KDReceiveFileRequest request, CancellationToken cancellationToken)
     {
         if (request.File is null || request.File.FileContent == null || request.File.FileContent.Length == 0 || request.File.FileName == null || request.File.FileName.Length <= 3) return BadRequest("Archivo vacío.");
+        
+        var tco = request.TextChunkerOptions
+            ?? await _textChunkerOptionsSercvice.GetTextChunkerOptions(cancellationToken);
 
         using var stream = new MemoryStream(request.File.FileContent);
 
-        var cmd = new KDReceiveFileCommand(request.Metadata, request.TextChunkerOptions ?? new TextChunkerOptions(), request.File.FileName, stream);
+        var cmd = new KDReceiveFileCommand(request.Metadata, tco, request.File.FileName, stream);
         var rslt = await _mediator.Send(cmd, cancellationToken);
 
         return rslt.IsSuccess
@@ -60,7 +69,10 @@ public class RagController : ControllerBase
     [HttpPost("ingest/url")]
     public async Task<IActionResult> UploadUrl([FromBody] KDReceiveUrlRequest request, CancellationToken cancellationToken)
     {
-        var command = new KDReceiveUrlCommand(request.Metadata, request.TextChunkerOptions ?? new TextChunkerOptions(), request.Url);
+        var tco = request.TextChunkerOptions
+            ?? await _textChunkerOptionsSercvice.GetTextChunkerOptions(cancellationToken);
+
+        var command = new KDReceiveUrlCommand(request.Metadata, tco, request.Url);
         var rslt = await _mediator.Send(command, cancellationToken);
 
         return rslt.IsSuccess

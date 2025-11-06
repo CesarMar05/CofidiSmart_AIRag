@@ -20,13 +20,13 @@ public class ApplicationClientRepository(RAGSqlServerDbContext context) : Reposi
         _context.ApplicationClients
             .FirstOrDefaultAsync(ac => ac.Name == name, cancellationToken);
 
-    public Task<ApplicationClientPrompt?> GetApplicationClientPrompt(Guid appCltId, string tenant, CancellationToken cancellationToken = default) =>
-        _context.ApplicationClientPrompts
+    public Task<ApplicationClientRAGConfig?> GetApplicationClientRAGConfig(Guid appCltId, string tenant, CancellationToken cancellationToken = default) =>
+        _context.ApplicationClientRAGConfigs
             .FirstOrDefaultAsync(acp => acp.ApplicationClientId == appCltId && acp.Tenant == tenant, cancellationToken);
 
-    public async Task<ApplicationClientPrompt> AddApplicationClientPrompt(ApplicationClientPrompt acp, CancellationToken cancellationToken = default)
+    public async Task<ApplicationClientRAGConfig> AddApplicationClientRAGConfig(ApplicationClientRAGConfig acp, CancellationToken cancellationToken = default)
     {
-        return (await _context.ApplicationClientPrompts
+        return (await _context.ApplicationClientRAGConfigs
              .AddAsync(acp, cancellationToken))
              .Entity;
     }

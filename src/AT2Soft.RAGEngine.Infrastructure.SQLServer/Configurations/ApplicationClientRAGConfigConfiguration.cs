@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AT2Soft.RAGEngine.Infrastructure.SQLServer.Configurations;
 
-public class ApplicationClientPromptConfiguration : IEntityTypeConfiguration<ApplicationClientPrompt>
+public class ApplicationClientRAGConfigConfiguration : IEntityTypeConfiguration<ApplicationClientRAGConfig>
 {
-    public void Configure(EntityTypeBuilder<ApplicationClientPrompt> builder)
+    public void Configure(EntityTypeBuilder<ApplicationClientRAGConfig> builder)
     {
-        builder.ToTable("ApplicationClientPrompts");
+        builder.ToTable("ApplicationClientRAGConfigs");
 
         builder.HasKey(a => a.ApplicationClientPromptId);
 
@@ -22,6 +22,19 @@ public class ApplicationClientPromptConfiguration : IEntityTypeConfiguration<App
 
         builder.Property(a => a.Prompt)
             .IsRequired();
+
+        builder.Property(a => a.TargetTokens)
+            .IsRequired();
+
+        builder.Property(a => a.MaxTokens)
+            .IsRequired();
+
+        builder.Property(a => a.MinTokens)
+            .IsRequired();
+
+        builder.Property(a => a.OverlapTokens)
+            .IsRequired();
+
 
         builder.HasIndex(e => new { e.ApplicationClientId, e.Tenant })
             .IsUnique();

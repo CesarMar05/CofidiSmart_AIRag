@@ -12,5 +12,6 @@ public interface IApplicationClientService
     Task<Result<ApplicationClientInfo?>> FindByNameAsync(string name, CancellationToken cancellationToken = default);
     Task<Result<List<ApplicationClient>>> GetListAppClient(CancellationToken cancellationToken = default);
     Task<Result<bool>> ExistAdmin(CancellationToken cancellationToken = default);
-    Task<Result> SetPrompt(Guid applicationClientd, string tenant, string prompt, CancellationToken cancellationToken = default);
+    Task<Result> SetRAGConfig(Guid applicationClientd, string tenant, string prompt, int token, int maxTokes, int minToken, int overloapTokens, CancellationToken cancellationToken = default);
+    Task<Result<ApplicationClientRAGConfig?>> GetRAGConfig(Guid applicationClientd, string tenant, CancellationToken cancellationToken = default);
 }

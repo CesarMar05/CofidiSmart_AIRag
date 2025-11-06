@@ -1,3 +1,4 @@
+using AT2Soft.RAGEngine.Application.Abstractions.Features.AppClient.DTOs;
 using AT2Soft.RAGEngine.Application.Features.AppClient.Commands;
 using AT2Soft.RAGEngine.Application.Features.AppClient.Queries;
 using AT2Soft.RAGEngine.WebAPI.Security;
@@ -54,10 +55,10 @@ public class ApplicationClientController : ControllerBase
     }
 
     [Authorize(Policy = ScopePolicies.Admin)]
-    [HttpPost("{applicationId}/prompt")]
-    public async Task<IActionResult> ApplicationSetPrompt(Guid applicationId, [FromBody] string prompt, CancellationToken cancellationToken)
+    [HttpPost("{applicationId}/ragconfig")]
+    public async Task<IActionResult> ApplicationSetPrompt(Guid applicationId, [FromBody] RAGConfigDto request, CancellationToken cancellationToken)
     {
-        var query = new ApplicationCltSetPromptCommand(applicationId, string.Empty, prompt);
+        var query = new ApplicationCltSetRAGConfigCommand(applicationId, string.Empty, request.Prompt, request.TargetTokens, request.MaxTokens, request.MinTokens, request.OverlapTokens);
         var rslt = await _mediator.Send(query, cancellationToken);
 
         return rslt.IsSuccess
@@ -68,10 +69,10 @@ public class ApplicationClientController : ControllerBase
     }
 
     [Authorize(Policy = ScopePolicies.Admin)]
-    [HttpPost("{applicationId}/{tenant}/prompt")]
-    public async Task<IActionResult> ApplicationSetPrompt(Guid applicationId,  string tenant, [FromBody] string prompt, CancellationToken cancellationToken)
+    [HttpPost("{applicationId}/{tenant}/ragconfig")]
+    public async Task<IActionResult> ApplicationSetPrompt(Guid applicationId,  string tenant, [FromBody] RAGConfigDto request, CancellationToken cancellationToken)
     {
-        var query = new ApplicationCltSetPromptCommand(applicationId, string.Empty, prompt);
+        var query = new ApplicationCltSetRAGConfigCommand(applicationId, tenant, request.Prompt, request.TargetTokens, request.MaxTokens, request.MinTokens, request.OverlapTokens);
         var rslt = await _mediator.Send(query, cancellationToken);
 
         return rslt.IsSuccess
