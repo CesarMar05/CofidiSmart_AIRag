@@ -79,16 +79,37 @@ public class ApplicationClientService : IApplicationClientService
         return await _applicationClientRepository.ExistAdminAsync(cancellationToken);
     }
 
-    public async Task<Result> SetPrompt(Guid applicationClientd, string prompt, CancellationToken cancellationToken = default)
+    public async Task<Result> SetRAGConfig(Guid applicationClientd, string tenant, string prompt, int tokens, int maxTokens, int minTokens, int overlapTokens, CancellationToken cancellationToken = default)
     {
         var found = await _applicationClientRepository.GetByIdAsync(applicationClientd, cancellationToken);
         if (found == null)
             return Result.Failure(new("ApplicationClientNotFound", $"No fue posible localizar Applicationclient"));
 
-        found.Prompt = prompt;
+        if (string.IsNullOrWhiteSpace(tenant))
+        {
+            found.Prompt = prompt;
+        }
+
+        var acpFound = await _applicationClientRepository.GetApplicationClientRAGConfig(applicationClientd, tenant, cancellationToken);
+        acpFound ??= await _applicationClientRepository.AddApplicationClientRAGConfig(new ApplicationClientRAGConfig
+        {
+            ApplicationClientId = applicationClientd,
+            Tenant = tenant,
+            Prompt = prompt,
+            TargetTokens = tokens,
+            MaxTokens = maxTokens,
+            MinTokens = minTokens,
+            OverlapTokens = overlapTokens
+        }, cancellationToken);
+        acpFound.Prompt = prompt;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
+    }
+    
+    public async Task<Result<ApplicationClientRAGConfig?>> GetRAGConfig(Guid applicationClientd, string tenant, CancellationToken cancellationToken = default)
+    {
+        return await _applicationClientRepository.GetApplicationClientRAGConfig(applicationClientd, tenant, cancellationToken);
     }
 }

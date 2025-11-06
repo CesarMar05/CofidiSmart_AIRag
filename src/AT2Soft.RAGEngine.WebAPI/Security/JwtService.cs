@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using AT2Soft.RAGEngine.Application.DTOs;
 using AT2Soft.RAGEngine.Application.Interfaces.Security;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +18,7 @@ public class JwtService : IJwtService
         _configuration = configuration;
     }
 
-    public TokenResponse GenerateToken(Guid appId, string scope)
+    public TokenResponse GenerateToken(Guid appId, string userId, string tenant, IReadOnlyList<string> divisions, string scope)
     {
         // ====== Cargar configuración ======
         var jwtCfg = _configuration.GetSection("Jwt");
@@ -29,6 +30,10 @@ public class JwtService : IJwtService
         var claims = new List<Claim>
         {
             new("client_id", appId.ToString()),
+            new(ClaimTypes.NameIdentifier, userId),
+            new(ClaimTypes.Email, userId),
+            new("tenant", tenant),
+            new("divisions", JsonSerializer.Serialize(divisions)),
             new("scope", scope)
         };
 

@@ -260,6 +260,9 @@ PublishScripts/
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
+# Permitir los .nupkg dentro de la carpeta ./nuget_packages
+!nuget_packages/
+!nuget_packages/**/*.nupkg
 
 # Microsoft Azure Build Output
 csx/

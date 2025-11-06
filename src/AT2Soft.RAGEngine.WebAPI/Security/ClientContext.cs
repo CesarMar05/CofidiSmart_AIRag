@@ -1,18 +1,24 @@
+using System.Security.Claims;
+using System.Text.Json;
 using AT2Soft.RAGEngine.Application.Abstractions.Authentication;
 
 namespace AT2Soft.RAGEngine.WebAPI.Security;
 
-public class ClientContext : IClientContext
+public class ClientContext(IHttpContextAccessor httpContextAccessor) : IClientContext
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _contextAccessor = httpContextAccessor;
 
-    public ClientContext(IHttpContextAccessor httpContextAccessor)
+    public string? ClientId => _contextAccessor.HttpContext?.User?.FindFirst("client_id")?.Value;
+    public string? UserId => _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    public string? Email => _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+    public string? Tenant => _contextAccessor.HttpContext?.User?.FindFirst("tenant")?.Value;
+    public IReadOnlyList<string> Divisions => ClaimToList(_contextAccessor.HttpContext?.User?.FindFirst("divisions"));
+    
+    private static List<string> ClaimToList(Claim? claim)
     {
-        _httpContextAccessor = httpContextAccessor;
-    }
+        if (claim == null || claim.Value == null)
+            return [];
 
-    public Guid ClientId =>
-        _httpContextAccessor.HttpContext?.User?.FindFirst("client_id") == null
-        ? new Guid()
-        : new Guid(_httpContextAccessor.HttpContext?.User?.FindFirst("client_id")?.Value!);
+        return JsonSerializer.Deserialize<List<string>>(claim.Value) ?? [];
+    }
 }

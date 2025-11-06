@@ -16,19 +16,21 @@ public class ChatController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IAIModelService _ollamaService;
     private readonly IClientContext _clientContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ChatController(IAIModelService ollamaService, IMediator mediator, IClientContext clientContext)
+    public ChatController(IAIModelService ollamaService, IMediator mediator, IClientContext clientContext, IHttpContextAccessor httpContextAccessor)
     {
         _ollamaService = ollamaService;
         _mediator = mediator;
         _clientContext = clientContext;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [Authorize(Policy = ScopePolicies.Query)]
-    [HttpPost("{tenant}")]
-    public async Task<IActionResult> Ask(string tenant,[FromBody] ChatAskRequest request, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<IActionResult> Ask([FromBody] ChatAskRequest request, CancellationToken cancellationToken)
     {
-        var command = new ChatAskCommand(_clientContext.ClientId, tenant, request.Question, request.SearchContext);
+        var command = new ChatAskCommand(request.Question, request.SearchContext);
         var rslt = await _mediator.Send(command, cancellationToken);
 
         return rslt.IsSuccess

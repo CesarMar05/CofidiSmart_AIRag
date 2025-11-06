@@ -8,7 +8,7 @@ namespace AT2Soft.RAGEngine.Application.Interfaces.Services;
 
 public interface IRagIngestJobServices
 {
-    Task<Result<Guid>> AddRagIngestJob(Guid applicationId, KDMetadataRequest metadata, TextChunkerOptions textChunkerOptions, KnowledgeDocumentType sourceType, string source, string Text, CancellationToken cancellationToken = default);
-    Task<Result<RagIngestJobInfo>> GetRagIngestJobInfo(Guid appId, string tenantId, Guid jobId, CancellationToken cancellationToken);
-    Task<Result<List<RagIngestJobInfo>>> GetRagIngestJobInfoList(Guid appId, string tenantId, CancellationToken cancellationToken);
+    Task<Result<Guid>> AddRagIngestJob(KDMetadataRequest metadata, TextChunkerOptions textChunkerOptions, KnowledgeDocumentType sourceType, string source, string Text, CancellationToken cancellationToken = default);
+    Task<Result<RagIngestJobInfo>> GetRagIngestJobInfo(Guid jobId, CancellationToken cancellationToken);
+    Task<Result<List<RagIngestJobInfo>>> GetRagIngestJobInfoList(CancellationToken cancellationToken);
 }

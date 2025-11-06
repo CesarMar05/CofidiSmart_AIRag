@@ -7,6 +7,7 @@ public sealed record KDMetadataRequest(
     string TenantId,
     string Title,
     string Topic,
-    List<string> Tags,
-    string Description
+    IReadOnlyList<string> Tags,
+    string Description,
+    IReadOnlyList<string>? Divisions
 );

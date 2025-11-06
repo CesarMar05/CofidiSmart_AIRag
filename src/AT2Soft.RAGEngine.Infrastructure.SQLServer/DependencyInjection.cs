@@ -1,3 +1,5 @@
+using AT2Soft.RAGEngine.Application.Features.TextChunkerOptionsFeature.Interfaces;
+using AT2Soft.RAGEngine.Application.Features.TextChunkerOptionsFeature.Services;
 using AT2Soft.RAGEngine.Application.Interfaces;
 using AT2Soft.RAGEngine.Application.Persistence.Interfaces;
 using AT2Soft.RAGEngine.Application.Persistence.Migrations;
@@ -27,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IApplicationClientRepository, ApplicationClientRepository>();
         services.AddScoped<IRagIngestJobRepository, RagIngestJobRepository>();
         services.AddScoped<IMigrationRepository, MigrationRepository>();
+        services.AddScoped<ITextChunkerOptionsService, TextChunkerOptionsService>();
 
         return services;
     }

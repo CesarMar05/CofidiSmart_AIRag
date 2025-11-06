@@ -11,11 +11,14 @@ public class Payload
     [JsonPropertyName("tenant")]
     public string TenantId { get; set; } = string.Empty;
 
+    [JsonPropertyName("divisions")]
+    public IReadOnlyList<string> Divisions { get; set; } = [];
+
     [JsonPropertyName("topic")]
     public string Topic { get; set; } = string.Empty;
 
     [JsonPropertyName("tags")]
-    public List<string> Tags { get; set; } = [];
+    public IReadOnlyList<string> Tags { get; set; } = [];
 
     [JsonPropertyName("kd_id")]
     public Guid KnowledgeDocumentId { get; set; }
